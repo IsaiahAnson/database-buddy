@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Pipedream steps are ES modules, so each is syntax-checked as .mjs.
+      - name: Syntax-check workflow steps
+        run: |
+          for f in steps/*.js; do
+            cp "$f" "$RUNNER_TEMP/step.mjs"
+            node --check "$RUNNER_TEMP/step.mjs" && echo "ok  $f"
+          done
